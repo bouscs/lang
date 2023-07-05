@@ -1,3 +1,5 @@
+# lang
+
 parse nodes:
 
 - Statement
@@ -16,12 +18,54 @@ parse nodes:
 
   - A scope is a series of statements, optionally returning a value
 
-<!-- begin optional -->
+  - Inside a scope it has its own `self` context
 
-- Types
+- Comment
 
-      - Statement: A statement scope can have multiple statements. The top-level scope in a file, for example, is a statement scope.
+  - Single-line or multi-line
 
-      - Expression: An expression scope evaluates to a value. It can have statements,
+character types:
 
-  <!-- end optional -->
+- word
+
+  - a-zA-Z
+
+  - 0-9 (not at the beginning of a token)
+
+- Block bounds
+
+  - () {} [] <> ' "
+
+- Operators
+
+  - - - - / % ^ & | ~ ! = < > ? : ; , . @ # $ \_ \ `
+
+- Whitespace
+
+  - \s \t
+
+- Newline
+
+  - \n
+
+- Escape
+
+  - \\
+
+Precedence:
+
+- Parenthesis
+
+- Statements
+
+- List
+
+- Assignment
+
+- Function Definition
+
+- Function Call
+
+- Arithmetic
+
+- Comparison
