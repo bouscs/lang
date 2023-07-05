@@ -1,0 +1,169 @@
+mut a <- 2
+
+let f = b -> a + b
+
+let g = (a: number, b: number) -> {
+  let c <- a + b
+
+  c
+}
+
+mut d <- g(1, a)
+
+struct S {
+  name: string
+}
+
+alias TypeFunction = CompileFunction<ArgTypes(type) & ReturnType(type)>
+
+let A: TypeFunction = T -> T | number
+
+mut e: A(string) <- 2
+
+measurement Space = Real // & Positive
+
+unit Meter measures Space {
+  
+}
+
+measurement time -> Real
+
+unit second {
+  measures time
+}
+
+// filter Positive (?)
+set Positive for number -> value > 0
+// Um set equivale a um type union
+
+let my_var: number<Positive> <- 0
+
+
+set Range in number = (min: number, max: number<GreaterThanOrEqual(min)>) -> value >= min & value <= max
+
+set Range(min: number, max: number<GreaterThanOrEqual(min)>) in number -> value >= min & value <= max
+
+
+set Unique in array {
+  can add(element) {
+    !contains(element)
+  }
+
+  element -> !splice(index).contains(element)
+}
+
+
+usable (statement) data_type {
+  static registry: array<UniqueElements, All(self)> = []
+
+  init {
+    
+  }
+}
+
+statement block {
+  use data_type_statement
+
+  dynamic input matches object
+
+  
+}
+
+block ArgList {
+  // First, get all argument names and add them as empty properties to self
+}
+
+
+
+block Function(args: dynamic array<All(type)>) {
+  declare input {
+    arguments: typeof args
+  }
+
+  init {
+    arguments = input.arguments
+  }
+}
+
+statement CoolStatement {
+  key = "cool"
+
+  set Tokens = Length(1)
+
+  @(
+    purposes {
+      input = dynamic
+      colors = Array<All(Color), Length(tokens.join().length)>
+      default = input
+    }
+  )
+  parse = (tokens: Array<Length(1) & All(Token)>) -> {
+    // stuff, return anything
+
+    for input return tokens[0] to string
+    for colors return tokens[0].map(char -> Color::red)
+  }
+
+  execute = (parsed: ReturnType(parse)<Purpose(input)>) -> {
+    print(parsed)
+
+    Statement.from("print(\"printed cool stuff!\"")
+  }
+}
+
+cool thing // prints "thing", then "printed cool stuff!"
+
+enum BlockType {
+  module
+  struct
+}
+
+enum BlockType { function }
+
+statement event {
+  valid_block: LogicalValue(BlockType) = struct<EventEmitter> | module
+
+  
+
+  tokens: Elements(SymbolToken, BlockToken<Property(args = dynamic) & Property(default_listener = func<Args(args) & Returns(void)>)>?)
+
+  execute = tokens -> {
+    //
+    let key = tokens[0] to string
+    let block = tokens[1] ?? BlockToken::from(jdjsjfodsjdb)
+
+    let result = BlockToken::execute(block)
+  }
+}
+
+
+struct Element {
+  extends Node
+
+
+  on attach -> {
+    
+  }
+
+  event start() {
+    default = () -> {
+      print("start")
+    }
+  }
+
+  event destroy
+
+  static {
+    from() {
+      Element {}
+    }
+  }
+
+  static new() {
+    Element {}
+  }
+}
+
+local {
+  // Don't export stuff
+}
