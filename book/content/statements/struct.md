@@ -1,4 +1,4 @@
-# Struct
+# struct
 
 A struct is a type with fields and methods.
 
