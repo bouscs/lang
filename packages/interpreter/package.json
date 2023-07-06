@@ -1,0 +1,12 @@
+{
+  "name": "interpreter",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "src/index.ts",
+  "scripts": {
+    "clean": "npx rimraf dist/",
+    "copy-files": "npx copyfiles -u 1 src/**/*.vi dist/",
+    "build": "tsc -p tsconfig.json"
+  }
+}
