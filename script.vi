@@ -22,7 +22,15 @@ mut e: A(string) <- 2
 
 measurement Space = Real // & Positive
 
-unit Meter measures Space {
+measurement Time = Real
+
+measurement mass = Real
+
+unit gram for mass {
+
+}
+
+unit Meter for Space {
   
 }
 
@@ -53,7 +61,7 @@ set Unique in array {
 }
 
 
-usable (statement) data_type {
+usable data_type {
   static registry: array<UniqueElements, All(self)> = []
 
   init {
@@ -61,8 +69,12 @@ usable (statement) data_type {
   }
 }
 
+usable data_type for statement {
+
+}
+
 statement block {
-  use data_type_statement
+  use data_type
 
   dynamic input matches object
 
