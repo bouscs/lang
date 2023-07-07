@@ -60,6 +60,8 @@ Precedence:
 
 - List
 
+- Access (.) - Changes scope to the symbol's value (eg. "my_var." sets the scope to my_var where you can access its inner symbols)
+
 - Assignment
 
 - Function Call
