@@ -58,11 +58,11 @@ Precedence:
 
 - Statements
 
-- Function Call
-
 - List
 
 - Assignment
+
+- Function Call
 
 - Function Definition
 
