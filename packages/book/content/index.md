@@ -54,11 +54,11 @@ character types:
 
 Precedence:
 
+- Parenthesis
+
 - Statements
 
 - Function Call
-
-- Parenthesis
 
 - List
 
