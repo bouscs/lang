@@ -1,4 +1,4 @@
-import { resolve, sep } from 'path'
+import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 import { Readable, Writable, PassThrough } from 'stream'
 import { Scope } from './Scope.js'
@@ -47,11 +47,7 @@ const blockParser: (options: { endCharacter: string }) => LineParser =
     }
   }
 
-const parenthesisExpressionParser: LineParser = async ({
-  code,
-  scope,
-  parse
-}) => {
+const parenthesisExpressionParser: LineParser = async ({ code, scope, parse }) => {
   console.log('parenthesisExpressionParser code', code)
   const newLine = code.findIndex(token => token.value === '\n')
   console.log('parenthesisExpressionParser newLine', newLine)
@@ -111,6 +107,10 @@ export class Interpreter {
 
     let currentToken = ''
 
+    // TODO - limpar o código antes de tokenizar: remover comentários, espaços desnecessários, newlines desnecessários
+
+    // TODO retornar lista de linhas, não de tokens
+
     const separators = ['(', ')', '\r', '\n', '\t']
 
     for (const character of code) {
@@ -160,7 +160,10 @@ export class Interpreter {
 
     const lines: ParseResult[] = []
 
-    while (code.some(token => token.value === '\n')) {
+    do {
+      if (code[0].value === '\n') {
+        code = code.slice(1)
+      }
       let line: ParseResult | undefined
 
       for (const parser of parsers) {
@@ -186,9 +189,10 @@ export class Interpreter {
 
         const lineCode = code.slice(0, newLine)
 
-        code = code.slice(newLine + 1)
+        code = code.slice(lineCode.length + 1)
 
         console.log('lineCode', lineCode)
+        console.log('new code', code)
 
         line = {
           value: lineCode,
@@ -202,7 +206,7 @@ export class Interpreter {
       }
 
       lines.push(line)
-    }
+    } while (code[0]?.value === '\n')
 
     return {
       value: lines,
@@ -230,7 +234,7 @@ export class Interpreter {
 
     scope.createDataType('symbol')
     scope.createDataType('expression')
-    scope.createDataType('statement')
+    scope.createDataType('type')
 
     const tokens = await this.tokenize(code)
 
