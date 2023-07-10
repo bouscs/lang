@@ -8,5 +8,14 @@
     "clean": "npx rimraf dist/",
     "copy-files": "npx copyfiles -u 1 src/**/*.vi dist/",
     "build": "tsc -p tsconfig.json"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": [
+          "{workspaceRoot}/tsconfig.json"
+        ]
+      }
+    }
   }
 }

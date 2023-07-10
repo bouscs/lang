@@ -5,14 +5,14 @@
     "default": {
       "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["compile", "lint", "test", "build"],
+        "cacheableOperations": ["compile", "lint", "test", "build", "clean", "copy-files"],
         "accessToken": "NWUzNDBlMjgtNDllOC00YTg1LWFkOGUtNDkwNjI2Njc0MmIzfHJlYWQtd3JpdGU="
       }
     }
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build", "clean", "copy-files"]
     },
     "start": {
       "dependsOn": ["build"]
