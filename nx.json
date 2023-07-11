@@ -5,7 +5,7 @@
     "default": {
       "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["compile", "lint", "test", "build", "clean", "copy-files"],
+        "cacheableOperations": ["compile", "lint", "test", "build", "copy-files"],
         "accessToken": "NWUzNDBlMjgtNDllOC00YTg1LWFkOGUtNDkwNjI2Njc0MmIzfHJlYWQtd3JpdGU="
       }
     }

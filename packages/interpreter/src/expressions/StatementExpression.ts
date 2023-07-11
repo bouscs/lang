@@ -53,7 +53,10 @@ export class StatementExpression extends Expression {
     const result = await this.expression.execute(context)
 
     if (result instanceof SymbolValue && !context.exists(result.raw())) {
-      context.set(result.raw(), new BooleanValue(true))
+      context.create(result.raw(), {
+        value: new BooleanValue(true),
+        type: 'boolean'
+      })
     }
 
     return result

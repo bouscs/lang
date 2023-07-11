@@ -48,7 +48,11 @@ export class ParenthesisExpression extends Expression {
 
     for (let i = 0; i < values.length; i++) {
       if (values[i] instanceof SymbolValue) {
-        const value = scope.get(values[i].raw())
+        const value = scope.get(values[i].raw()).value
+
+        if (!value) {
+          throw new Error(`Symbol ${values[i].raw()} is not defined`)
+        }
 
         values[i] = value
       }

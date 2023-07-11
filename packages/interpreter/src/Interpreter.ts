@@ -319,7 +319,10 @@ export class Interpreter {
 
     const scope = new Scope()
 
-    scope.set('print', new CallableValue((...args: Value[]) => console.log(...args.map(p => p.toString()))))
+    scope.create('print', {
+      type: 'callable',
+      value: new CallableValue((...args: Value[]) => console.log(...args.map(p => p.toString())))
+    })
 
     const cleanedCode = cleanCode(code)
 
@@ -327,7 +330,7 @@ export class Interpreter {
 
     const parsed = new ModuleExpression(await this.parse(tokenLines))
 
-    console.log(JSON.stringify({ parsed }, null, 2))
+    // console.log(JSON.stringify({ parsed }, null, 2))
 
     const result = await parsed.execute(scope)
 

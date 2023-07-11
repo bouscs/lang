@@ -43,9 +43,15 @@ export class AssignmentExpression extends Expression {
     const right = await this.right.execute(context)
 
     if (right instanceof SymbolValue) {
-      context.set(left.value, context.get(right.value))
+      context.create(left.value, {
+        type: context.get(right.value).type,
+        value: context.get(right.value).value?.clone()
+      })
     } else {
-      context.set(left.value, right)
+      context.create(left.value, {
+        type: right.type(),
+        value: right
+      })
     }
 
     return new NoneValue()
