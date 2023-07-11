@@ -10,10 +10,6 @@ const interpreter = new Interpreter()
 const start = async () => {
   const filePath = join(__dirname, 'script.vi')
   const result = await interpreter.executeFile(filePath)
-
-  console.log('Execution complete')
-
-  console.log(result)
 }
 
 start()

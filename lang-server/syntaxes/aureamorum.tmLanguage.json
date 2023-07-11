@@ -1,32 +1,73 @@
 {
-	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "aureamorum",
-	"patterns": [
-		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#strings"
-		}
-	],
-	"repository": {
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.aureamorum",
-				"match": "\\b(if|while|for|return)\\b"
-			}]
-		},
-		"strings": {
-			"name": "string.quoted.double.aureamorum",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "constant.character.escape.aureamorum",
-					"match": "\\\\."
-				}
-			]
-		}
-	},
-	"scopeName": "source.aureamorum"
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "aureamorum",
+  "patterns": [
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#literals"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#variables"
+    }
+  ],
+  "repository": {
+    "operators": {
+      "name": "keyword.operator.aureamorum",
+      "match": "\\b(<-)\\b"
+    },
+    "literals": {
+      "name": "constant.language.aureamorum",
+      "match": "\\b(true|false|none)\\b"
+    },
+    "numbers": {
+      "name": "constant.numeric.aureamorum",
+      "match": "\\b(\\d+(\\.\\d+)?)\\b"
+    },
+    "variables": {
+      "name": "variable.parameter.aureamorum",
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b"
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "support.function.aureamorum",
+          "match": "\\b(print)\\b"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.aureamorum",
+          "match": "\\b(if|while|for|return)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.aureamorum",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.aureamorum",
+          "match": "\\\\."
+        }
+      ]
+    }
+  },
+  "scopeName": "source.aureamorum"
 }

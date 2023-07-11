@@ -1,10 +1,29 @@
+my_var <- 1
 
+my_other_var <- 2
 
-my_var     =    1
+cool
 
+print(my_var)
 
+print(
+  a <- 3
+  b <- 4
+  print(4365)
+  my_other_var
+  b
+)
 
+print(cool)
 
-print   (  my_var  )
+my_var_two <- 3
 
-my_bool    =       my_var    <=  10
+print(my_var)
+
+my_bool <- my_var
+
+print(my_bool)
+
+uncool <- false
+
+print(uncool)

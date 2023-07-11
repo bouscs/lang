@@ -2,9 +2,20 @@ import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 import { Readable, Writable, PassThrough } from 'stream'
 import { Scope } from './Scope.js'
-import { ExpressionParser } from './ExpressionParser.js'
 import { ParenthesisExpression } from './expressions/ParenthesisExpression.js'
-import { getBlockInner } from './util.js'
+import { getBlockInner, range } from './util.js'
+import { Expression, ExpressionConstructor } from './Expression.js'
+import { TokenExpression } from './expressions/TokenExpression.js'
+import { SymbolExpression } from './expressions/SymbolExpression.js'
+import { NumberLiteralExpression } from './expressions/NumberLiteralExpression.js'
+import { AssignmentExpression } from './expressions/AssignmentExpression.js'
+import { StatementExpression } from './expressions/StatementExpression.js'
+import { CallExpression } from './expressions/CallExpression.js'
+import { ModuleExpression } from './expressions/ModuleExpression.js'
+import { CallableValue } from './values/CallableValue.js'
+import { NumberValue } from './values/NumberValue.js'
+import { Value } from './Value.js'
+import { BooleanLiteralExpression } from './expressions/BooleanLiteralExpression.js'
 
 export type Token = {
   parsedType: 'token'
@@ -115,9 +126,9 @@ const cleanCode = (code: string) => {
 }
 
 const tokenize = (code: string) => {
-  const tokens = [] as Token[][]
+  const tokens = [] as TokenExpression[][]
 
-  let currentLine = [] as Token[]
+  let currentLine = [] as TokenExpression[]
   let currentToken = ''
 
   const blockTokens = {
@@ -179,34 +190,19 @@ const tokenize = (code: string) => {
 
     if (charTypes.singleOnly.includes(character)) {
       if (currentToken.length > 0) {
-        currentLine.push({
-          parsedType: 'token',
-          tokenType: 'single',
-          value: currentToken,
-          raw: () => currentToken
-        })
+        currentLine.push(new TokenExpression(currentToken))
 
         currentToken = ''
       }
 
-      currentLine.push({
-        parsedType: 'token',
-        tokenType: 'single',
-        value: character,
-        raw: () => character
-      })
+      currentLine.push(new TokenExpression(character))
 
       continue
     }
 
     if (charType !== lastCharType) {
       if (currentToken.length > 0) {
-        currentLine.push({
-          parsedType: 'token',
-          tokenType: 'single',
-          value: currentToken,
-          raw: () => currentToken
-        })
+        currentLine.push(new TokenExpression(currentToken))
 
         currentToken = ''
       }
@@ -220,12 +216,7 @@ const tokenize = (code: string) => {
   }
 
   if (currentToken.length > 0) {
-    currentLine.push({
-      parsedType: 'token',
-      tokenType: 'single',
-      value: currentToken,
-      raw: () => currentToken
-    })
+    currentLine.push(new TokenExpression(currentToken))
   }
 
   if (currentLine.length > 0) {
@@ -242,69 +233,25 @@ const toLines = (code: string) => {
     .filter(Boolean)
 }
 
-export interface ParseLineOptions {
-  tokens: Token[]
-  tokenLines: Token[][]
-  scope: Scope
-  parsers: ExpressionParser[]
-  parse: typeof Interpreter.prototype.parse
-}
-
-export type LineParser = (options: ParseLineOptions) => Promise<ParsedLine>
-
-const parseLine: LineParser = async options => {
-  const { tokens, scope } = options
-
-  let parser: ExpressionParser | undefined = undefined
-
-  for (const parserCandidate of options.parsers) {
-    if (parserCandidate.match(options.tokens)) {
-      parser = parserCandidate
-      break
-    }
-  }
-
-  if (!parser) {
-    return {
-      parsedType: 'none',
-      content: tokens,
-      raw: () => tokens.map(t => t.raw()).join('')
-    }
-  }
-
-  const parsedLine = await parser.parseLine(options)
-
-  return parsedLine
-}
-
 export class Interpreter {
-  parsers = [new ParenthesisExpression()] as ExpressionParser[]
+  parsers: ExpressionConstructor[] = [
+    NumberLiteralExpression,
+    BooleanLiteralExpression,
+    SymbolExpression,
+    ParenthesisExpression,
+    AssignmentExpression,
+    CallExpression,
+    StatementExpression
+  ]
 
-  async parse(code: ParsedLine[], scope: Scope) {
-    // const lines = toLines(code)
-
-    const parsedLines = [] as ParsedLine[]
-
-    // for (const tokens of code) {
-    //   const parsedLine = await parseLine({
-    //     tokens,
-    //     tokenLines: code,
-    //     scope,
-    //     parsers: this.parsers.slice(),
-    //     parse: this.parse.bind(this)
-    //   })
-
-    //   parsedLines.push(parsedLine)
-    // }
-
-    while (code.some(p => p.parsedType === 'token')) {
-      console.log(JSON.stringify({ code }, null, 2))
+  async parse(code: Expression[]) {
+    while (code.some(p => p instanceof TokenExpression)) {
       let parsed = false
+
       for (const parserCandidate of this.parsers) {
         if (parserCandidate.match(code)) {
           await parserCandidate.parse({
             code,
-            scope,
             parse: this.parse.bind(this)
           })
 
@@ -315,8 +262,44 @@ export class Interpreter {
       }
 
       if (!parsed) {
-        return code
-        // throw new Error(`Could not parse line: ${code.map(c => c.raw()).join('')}`)
+        // return code
+        const errorToken = code.findIndex(p => p instanceof TokenExpression)
+
+        if (!errorToken) {
+          throw new Error('Unexpected error in code: ', { cause: code.map(p => p.raw()).join() })
+        }
+
+        const codeBefore = code.slice(0, errorToken)
+
+        const lineCount = codeBefore.filter(p => p instanceof TokenExpression && p.raw() === '\n').length
+
+        const line = lineCount + 1
+
+        const lastNewline = codeBefore.findLastIndex(p => p instanceof TokenExpression && p.raw() === '\n')
+
+        const codeBeforeLine = codeBefore.slice(lastNewline + 1)
+
+        const column = codeBeforeLine.map(p => p.raw()).join('').length + 1
+
+        const lineCode = codeBeforeLine.map(p => p.raw()).join('') + code[errorToken].raw()
+
+        console.log(
+          JSON.stringify(
+            {
+              code
+            },
+            null,
+            2
+          )
+        )
+
+        throw new Error(
+          `Could not parse token: "${code[
+            errorToken
+          ].raw()}" at line ${line}, column ${column}:\n\n${lineCode}\n${range(column - 1)
+            .map(() => ' ')
+            .join('')}^\n`
+        )
       }
     }
 
@@ -334,39 +317,24 @@ export class Interpreter {
 
     pass.pipe(stdout)
 
-    console.log('\n\nExecuting module:\n\n')
-    console.log(code)
-    console.log('\n\n')
-
     const scope = new Scope()
 
-    scope.createDataType('symbol')
-    scope.createDataType('expression')
-    scope.createDataType('type')
+    scope.set('print', new CallableValue((...args: Value[]) => console.log(...args.map(p => p.toString()))))
 
     const cleanedCode = cleanCode(code)
 
-    console.log(
-      '\n\n',
-      JSON.stringify(
-        {
-          original: code,
-          cleanedCode
-        },
-        null,
-        2
-      ),
-      '\n\n'
-    )
-
     const tokenLines = tokenize(cleanedCode)
 
-    const parsed = await this.parse(tokenLines, scope)
+    const parsed = new ModuleExpression(await this.parse(tokenLines))
 
-    console.log('\n\nparsed\n', JSON.stringify(parsed, null, 2), '\n\n')
+    console.log(JSON.stringify({ parsed }, null, 2))
+
+    const result = await parsed.execute(scope)
 
     pass.unpipe(stdout)
     pass.end()
+
+    return result
   }
 
   async executeFile(path: string, options?: ExecuteFileOptions) {

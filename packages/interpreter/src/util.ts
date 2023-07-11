@@ -1,14 +1,16 @@
+import { Expression } from './Expression.js'
 import { ParsedLine } from './Interpreter.js'
+import { TokenExpression } from './expressions/TokenExpression.js'
 
-export const getBlockInner = (code: ParsedLine[], openCharacter = '(', closeCharacter = ')', startLevel = 1) => {
+export const getBlockInner = (code: Expression[], openCharacter = '(', closeCharacter = ')', startLevel = 1) => {
   let level = startLevel
 
-  const innerParenthesis = [] as ParsedLine[]
+  const innerParenthesis = [] as Expression[]
 
   for (const character of code) {
-    if (character.parsedType === 'token' && character.value === openCharacter) {
+    if (character instanceof TokenExpression && character.value === openCharacter) {
       level++
-    } else if (character.parsedType === 'token' && character.value === closeCharacter) {
+    } else if (character instanceof TokenExpression && character.value === closeCharacter) {
       level--
     }
 
@@ -20,4 +22,12 @@ export const getBlockInner = (code: ParsedLine[], openCharacter = '(', closeChar
   }
 
   return innerParenthesis
+}
+
+export const isWordToken = (token: string) => {
+  return /[a-zA-Z_$][a-zA-Z_$0-9]*/.test(token)
+}
+
+export const range = (length: number, start = 0) => {
+  return Array.from({ length }, (_, index) => index + start)
 }
