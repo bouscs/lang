@@ -8,7 +8,7 @@
     "clean": "npx rimraf dist/",
     "copy-files": "npx copyfiles -u 1 src/**/*.vi dist/",
     "compile": "tsc -p tsconfig.json",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && npm run copy-files",
     "start": "node dist/index.js",
     "dev": "nodemon"
   },
@@ -19,6 +19,8 @@
     "targets": {
       "clean": {
         "inputs": [
+          "{projectRoot}/src/**.*.vi",
+          "{projectRoot}/src/**.*.ts",
           {
             "externalDependencies": [
               "rimraf"
@@ -26,14 +28,19 @@
           }
         ]
       },
-      "copy-files": [
-        "{projectRoot}/**.*.vi",
-        {
-          "externalDependencies": [
-            "copyfiles"
-          ]
-        }
-      ]
+      "copy-files": {
+        "inputs": [
+          "{projectRoot}/src/**.*.vi",
+          {
+            "externalDependencies": [
+              "copyfiles"
+            ]
+          }
+        ],
+        "dependsOn": [
+          "clean"
+        ]
+      }
     }
   }
 }

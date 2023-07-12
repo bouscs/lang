@@ -16,6 +16,8 @@ import { CallableValue } from './values/CallableValue.js'
 import { NumberValue } from './values/NumberValue.js'
 import { Value } from './Value.js'
 import { BooleanLiteralExpression } from './expressions/BooleanLiteralExpression.js'
+import { PlusOperationExpression } from './expressions/arithmetic/PlusOperationExpression.js'
+import { MinusOperationExpression } from './expressions/arithmetic/MinusOperationExpression.js'
 
 export type Token = {
   parsedType: 'token'
@@ -235,10 +237,16 @@ const toLines = (code: string) => {
 
 export class Interpreter {
   parsers: ExpressionConstructor[] = [
+    // literals
     NumberLiteralExpression,
     BooleanLiteralExpression,
     SymbolExpression,
+    // blocks
     ParenthesisExpression,
+    // operators
+    PlusOperationExpression,
+    MinusOperationExpression,
+    // statements
     AssignmentExpression,
     CallExpression,
     StatementExpression
@@ -283,15 +291,15 @@ export class Interpreter {
 
         const lineCode = codeBeforeLine.map(p => p.raw()).join('') + code[errorToken].raw()
 
-        console.log(
-          JSON.stringify(
-            {
-              code
-            },
-            null,
-            2
-          )
-        )
+        // console.log(
+        //   JSON.stringify(
+        //     {
+        //       code
+        //     },
+        //     null,
+        //     2
+        //   )
+        // )
 
         throw new Error(
           `Could not parse token: "${code[
@@ -332,12 +340,18 @@ export class Interpreter {
 
     // console.log(JSON.stringify({ parsed }, null, 2))
 
-    const result = await parsed.execute(scope)
+    try {
+      const result = await parsed.execute(scope)
 
-    pass.unpipe(stdout)
-    pass.end()
+      pass.unpipe(stdout)
+      pass.end()
 
-    return result
+      return result
+    } catch (error) {
+      throw new Error('Failed to execute code', {
+        // cause: { code: JSON.stringify(parsed, null, 2) }
+      })
+    }
   }
 
   async executeFile(path: string, options?: ExecuteFileOptions) {

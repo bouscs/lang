@@ -25,7 +25,7 @@ export abstract class Expression<T extends string = string, ReturnValue extends 
 
   abstract raw(): string
 
-  returnType() {
+  returnType(context?: Scope) {
     return 'none'
   }
 }

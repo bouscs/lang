@@ -46,12 +46,23 @@ export class ParenthesisExpression extends Expression {
       values.push(await ex.execute(scope))
     }
 
+    // console.log(
+    //   'parenthesis values',
+    //   JSON.stringify(
+    //     values.map(v => v?.raw()),
+    //     null,
+    //     2
+    //   )
+    // )
+
     for (let i = 0; i < values.length; i++) {
       if (values[i] instanceof SymbolValue) {
         const value = scope.get(values[i].raw()).value
 
         if (!value) {
-          throw new Error(`Symbol ${values[i].raw()} is not defined`)
+          throw new Error(`Symbol ${values[i].raw()} is not defined`, {
+            cause: { lines: [this.inner[i]], code: JSON.stringify(this.inner, null, 2) }
+          })
         }
 
         values[i] = value

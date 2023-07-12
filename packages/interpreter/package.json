@@ -13,7 +13,11 @@
     "targets": {
       "build": {
         "inputs": [
-          "{workspaceRoot}/tsconfig.json"
+          "{workspaceRoot}/tsconfig.json",
+          "{projectRoot}/src/**/*.ts"
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
         ]
       }
     }
