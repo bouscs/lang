@@ -21,17 +21,17 @@ export class CallExpression extends Expression {
       (ex, i) => ex.returnType() === 'symbol' && code[i + 1] instanceof ParenthesisExpression
     )
 
-    const symbol = code[callIndex] as Expression<string, SymbolValue>
+    const symbol = code[callIndex] as Expression
 
     const callInner = code[callIndex + 1] as ParenthesisExpression
 
     code.splice(callIndex, 2, new CallExpression(symbol, callInner))
   }
 
-  symbol: Expression<string, SymbolValue>
+  symbol: Expression
   callInner: ParenthesisExpression
 
-  constructor(symbol: Expression<string, SymbolValue>, callInner: ParenthesisExpression) {
+  constructor(symbol: Expression, callInner: ParenthesisExpression) {
     super('call')
 
     this.symbol = symbol
@@ -39,12 +39,12 @@ export class CallExpression extends Expression {
   }
 
   async execute(context: Scope) {
-    const symbol = await this.symbol.execute(context)
+    const value = await this.symbol.execute(context)
     const callInner = await this.callInner.execute(context)
 
-    const value = context.get(symbol.value).value as CallableValue
+    // const value = context.get(symbol.value).value as CallableValue
 
-    if (!(value instanceof CallableValue)) throw new Error(`Symbol ${symbol.value} is not callable`)
+    if (!(value instanceof CallableValue)) throw new Error(`Value ${value} is not callable`)
 
     return value.call(callInner)
   }

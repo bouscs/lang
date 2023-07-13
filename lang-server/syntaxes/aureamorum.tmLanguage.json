@@ -53,7 +53,7 @@
       "patterns": [
         {
           "name": "keyword.control.aureamorum",
-          "match": "\\b(if|while|for|return)\\b"
+          "match": "\\b(if|else|while|for|return)\\b"
         }
       ]
     },
@@ -61,6 +61,17 @@
       "name": "string.quoted.double.aureamorum",
       "begin": "\"",
       "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.aureamorum",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "strings-single": {
+      "name": "string.quoted.single.aureamorum",
+      "begin": "'",
+      "end": "'",
       "patterns": [
         {
           "name": "constant.character.escape.aureamorum",

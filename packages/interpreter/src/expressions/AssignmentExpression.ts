@@ -20,7 +20,7 @@ export class AssignmentExpression extends Expression {
 
     const left = code[assignmentIndex - 1] as Expression<string, SymbolValue>
 
-    const rightIndex = code.slice(assignmentIndex + 1).findIndex(t => t.returnType() !== 'none')
+    const rightIndex = code.slice(assignmentIndex + 1).findIndex(t => t.raw() !== '\n')
 
     const right = code[assignmentIndex + rightIndex + 1]
 

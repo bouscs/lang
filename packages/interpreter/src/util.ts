@@ -25,7 +25,7 @@ export const getBlockInner = (code: Expression[], openCharacter = '(', closeChar
 }
 
 export const isWordToken = (token: string) => {
-  return /[a-zA-Z_$][a-zA-Z_$0-9]*/.test(token)
+  return /[a-zA-Z_$][a-zA-Z_$0-9]*/.test(token) && !['if', 'else', 'true', 'false', 'null'].includes(token)
 }
 
 export const range = (length: number, start = 0) => {

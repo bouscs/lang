@@ -1,6 +1,38 @@
-my_var <- 1
+
+if true print("its true")
+
+my_var <- 10
+
+if my_var < 10 print("its less than 10")
+else print("its not less than 10")
+
+my_conditional_var <- if my_var < 10 1 else 2
+
+my_varr <- 11
+
+if(my_varr < 10) {
+  print("its less than 10")
+} else if(my_varr = 10) {
+  print("its 10")
+} else {
+  print("its:")
+  print(my_varr)
+}
+
+print(my_conditional_var)
 
 my_other_var <- 1 + 1 + 1 + (1 + 1) - 6
+
+result <- my_var + my_other_var
+
+print(result)
+
+result_one <- 4 * 1 + 2
+
+result_two <- 4 * (1 + 2)
+
+print(result_one)
+print(result_two)
 
 cool
 
@@ -9,8 +41,10 @@ print(
   a <- 3
   b <- 4
   print(4365)
+  "jadsnfkajsd"
   my_other_var
   b
+  "ahldksjadl"
 )
 
 print(cool)
@@ -20,9 +54,23 @@ my_var_two <- 3
 
 print(my_var)
 
-my_bool <- my_var
+my_bool <- my_var < 10
+
+print("uau!")
 
 print(my_bool)
+
+print(10 = 10)
+
+print(10 != 10)
+
+print(10 > 10)
+
+print(10 >= 10)
+
+my_string <- "hello world"
+
+print(my_string)
 
 uncool <- false
 

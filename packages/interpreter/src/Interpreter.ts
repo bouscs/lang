@@ -18,6 +18,17 @@ import { Value } from './Value.js'
 import { BooleanLiteralExpression } from './expressions/BooleanLiteralExpression.js'
 import { PlusOperationExpression } from './expressions/arithmetic/PlusOperationExpression.js'
 import { MinusOperationExpression } from './expressions/arithmetic/MinusOperationExpression.js'
+import { MultiplicationExpression } from './expressions/arithmetic/MultiplicationExpression.js'
+import { DivisionExpression } from './expressions/arithmetic/DivisionExpression.js'
+import { EqualExpression } from './expressions/comparators/EqualExpression.js'
+import { NotEqualExpression } from './expressions/comparators/NotEqualExpression.js'
+import { GreaterThanExpression } from './expressions/comparators/GreaterThanExpression.js'
+import { GreaterThanOrEqualExpression } from './expressions/comparators/GreaterThanOrEqualExpression.js'
+import { LessThanExpression } from './expressions/comparators/LessThanExpression.js'
+import { LessThanOrEqualExpression } from './expressions/comparators/LessThanOrEqualExpression.js'
+import { StringLiteralExpression } from './expressions/StringLiteralExpression.js'
+import { BlockExpression } from './expressions/BlockExpression.js'
+import { ConditionalExpression } from './expressions/ConditionalExpression.js'
 
 export type Token = {
   parsedType: 'token'
@@ -109,17 +120,17 @@ const cleanCode = (code: string) => {
     .replace(/(?<space> )+/g, ' ')
     .split('')
     .filter((char, index, chars) => {
-      if (charTypes.whitespace.includes(char)) {
-        const prevChar = chars[index - 1]
-        const nextChar = chars[index + 1]
+      // if (charTypes.whitespace.includes(char)) {
+      //   const prevChar = chars[index - 1]
+      //   const nextChar = chars[index + 1]
 
-        const prevCharType = getCharType(prevChar)
-        const nextCharType = getCharType(nextChar)
+      //   const prevCharType = getCharType(prevChar)
+      //   const nextCharType = getCharType(nextChar)
 
-        if (prevCharType !== nextCharType) {
-          return false
-        }
-      }
+      //   if (prevCharType !== nextCharType) {
+      //     return false
+      //   }
+      // }
 
       return true
     })
@@ -142,53 +153,44 @@ const tokenize = (code: string) => {
   for (let i = 0; i < code.length; i++) {
     const character = code[i]
 
-    // if (character === '\n') {
-    //   if (currentToken.length > 0) {
-    //     currentLine.push({
-    //       parsedType: 'token',
-    //       tokenType: 'single',
-    //       value: currentToken
-    //     })
+    if (character === '"') {
+      if (currentToken.length > 0) {
+        currentLine.push(new TokenExpression(currentToken))
 
-    //     currentToken = ''
-    //   }
+        currentToken = ''
+      }
 
-    //   tokens.push(currentLine)
+      let string = '"'
 
-    //   currentLine = []
+      for (let j = i + 1; j < code.length; j++) {
+        const char = code[j]
 
-    //   continue
-    // }
+        string += char
+
+        if (char === '"') {
+          i = j
+
+          break
+        }
+      }
+
+      currentLine.push(new TokenExpression(string))
+
+      continue
+    }
+
+    if (character === ' ') {
+      if (currentToken.length > 0) {
+        currentLine.push(new TokenExpression(currentToken))
+
+        currentToken = ''
+      }
+
+      continue
+    }
 
     const charType = getCharType(character)
     const lastCharType = getCharType(currentToken[currentToken.length - 1])
-
-    // if (Object.keys(blockTokens).includes(character)) {
-    //   if (currentToken.length > 0) {
-    //     currentLine.push({
-    //       tokenType: 'single',
-    //       value: currentToken
-    //     })
-
-    //     currentToken = ''
-    //   }
-
-    //   const inner = getBlockInner(code.slice(i + 1), character, blockTokens[character])
-
-    //   i += inner.length + 1
-
-    //   const tokens = tokenize(inner)
-
-    //   const blockToken: BlockToken = {
-    //     tokenType: 'block',
-    //     openCharacter: character,
-    //     value: tokens
-    //   }
-
-    //   currentLine.push(blockToken)
-
-    //   continue
-    // }
 
     if (charTypes.singleOnly.includes(character)) {
       if (currentToken.length > 0) {
@@ -240,15 +242,28 @@ export class Interpreter {
     // literals
     NumberLiteralExpression,
     BooleanLiteralExpression,
+    StringLiteralExpression,
     SymbolExpression,
     // blocks
     ParenthesisExpression,
+    BlockExpression,
     // operators
+    MultiplicationExpression,
+    DivisionExpression,
     PlusOperationExpression,
     MinusOperationExpression,
+    // comparisons
+    EqualExpression,
+    NotEqualExpression,
+    GreaterThanExpression,
+    GreaterThanOrEqualExpression,
+    LessThanExpression,
+    LessThanOrEqualExpression,
+    // expressions
+    CallExpression,
+    ConditionalExpression,
     // statements
     AssignmentExpression,
-    CallExpression,
     StatementExpression
   ]
 
@@ -338,7 +353,8 @@ export class Interpreter {
 
     const parsed = new ModuleExpression(await this.parse(tokenLines))
 
-    // console.log(JSON.stringify({ parsed }, null, 2))
+    console.log('Parsed code:\n')
+    console.log(parsed.raw())
 
     try {
       const result = await parsed.execute(scope)
@@ -349,7 +365,7 @@ export class Interpreter {
       return result
     } catch (error) {
       throw new Error('Failed to execute code', {
-        // cause: { code: JSON.stringify(parsed, null, 2) }
+        cause: { code: JSON.stringify(parsed, null, 2), error }
       })
     }
   }

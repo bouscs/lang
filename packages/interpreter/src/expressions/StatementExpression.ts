@@ -23,7 +23,9 @@ export class StatementExpression extends Expression {
       firstNewLineIndex = 0
     } else {
       if (!(code[1] instanceof TokenExpression && code[1].value === '\n')) {
-        throw new Error('Invalid statement')
+        throw new Error('Invalid statement', {
+          cause: { lines: [code[0], code[1]], code: JSON.stringify(code, null, 2) }
+        })
       }
       firstNewLineIndex = 1
     }
@@ -65,7 +67,7 @@ export class StatementExpression extends Expression {
   }
 
   raw() {
-    return this.expression.raw()
+    return '\n' + this.expression.raw()
   }
 
   returnType() {

@@ -38,7 +38,7 @@ export class Scope {
 
   get(name: string) {
     if (this.registry[name] === undefined) {
-      throw new Error(`Symbol "${name}" does not exist`)
+      throw new Error(`Symbol "${name}" does not exist`, { cause: { name } })
     }
 
     return this.registry[name]

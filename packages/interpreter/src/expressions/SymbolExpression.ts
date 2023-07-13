@@ -46,6 +46,14 @@ export class SymbolExpression extends Expression<string, Value> {
   }
 
   async execute(context: Scope) {
+    if (context.exists(this.symbol)) {
+      const property = context.get(this.symbol)
+
+      if (property.value) {
+        return property.value
+      }
+    }
+
     return new SymbolValue(this.symbol)
   }
 }
