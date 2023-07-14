@@ -28,6 +28,10 @@ export const isWordToken = (token: string) => {
   return /[a-zA-Z_$][a-zA-Z_$0-9]*/.test(token) && !['if', 'else', 'true', 'false', 'null'].includes(token)
 }
 
+export const isDigitToken = (token: string) => {
+  return /^[0-9]+$/.test(token)
+}
+
 export const range = (length: number, start = 0) => {
   return Array.from({ length }, (_, index) => index + start)
 }

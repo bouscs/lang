@@ -14,6 +14,10 @@ export class TokenExpression extends Expression {
     return this.value
   }
 
+  returnType(context?: Scope | undefined): string {
+    return 'token'
+  }
+
   async execute(context: Scope): Promise<Value> {
     throw new Error('Cannot execute raw token.')
   }

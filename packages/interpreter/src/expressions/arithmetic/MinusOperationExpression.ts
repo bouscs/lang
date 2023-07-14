@@ -19,9 +19,9 @@ export class MinusOperationExpression extends Expression {
 
     // console.log('code', JSON.stringify({ raw: code.map(c => c.raw()).join(''), code }, null, 2))
 
-    const plusIndex = code.findIndex(e => e instanceof TokenExpression && e.value === '-')
+    const plusIndex = code.findLastIndex(e => e instanceof TokenExpression && e.value === '-')
 
-    if (plusIndex === -1) throw new Error('Plus not found')
+    if (plusIndex === -1) throw new Error('Minus not found')
 
     const left = code[plusIndex - 1]
 
@@ -30,22 +30,26 @@ export class MinusOperationExpression extends Expression {
     // const right = code[plusIndex + 1]
     const right = code[plusIndex + rightIndex + 1]
 
-    // code.splice(plusIndex - 1, 3, new PlusOperationExpression(left, right))
-    code.splice(plusIndex - 1, rightIndex + 3, new MinusOperationExpression(left, right))
+    if (!left || left instanceof TokenExpression || left.returnType() !== 'value') {
+      code.splice(plusIndex, 2, new MinusOperationExpression(undefined, right))
+    } else {
+      // code.splice(plusIndex - 1, 3, new PlusOperationExpression(left, right))
+      code.splice(plusIndex - 1, rightIndex + 3, new MinusOperationExpression(left, right))
+    }
   }
 
-  leftOperand: Expression
+  leftOperand?: Expression
   rightOperand: Expression
 
-  constructor(leftOperand: Expression, rightOperand: Expression) {
-    super('plusOperation')
+  constructor(leftOperand: Expression | undefined, rightOperand: Expression) {
+    super('subtraction')
 
     this.leftOperand = leftOperand
     this.rightOperand = rightOperand
   }
 
   raw() {
-    return `${this.leftOperand.raw()} - ${this.rightOperand.raw()}`
+    return `${this.leftOperand ? this.leftOperand.raw() + ' - ' : '-'}${this.rightOperand.raw()}`
   }
 
   returnType(context?: Scope) {
@@ -65,14 +69,17 @@ export class MinusOperationExpression extends Expression {
 
     // TODO check if left and right types are compatible
 
-    return 'number'
+    return 'value'
   }
 
   async execute(context: Scope) {
-    const leftValue = (await this.leftOperand.execute(context)) as NumberValue
     const rightValue = (await this.rightOperand.execute(context)) as NumberValue
 
     // TODO execute operation from TypeValue
+
+    if (!this.leftOperand) return new NumberValue(-rightValue.value)
+
+    const leftValue = (await this.leftOperand.execute(context)) as NumberValue
 
     return new NumberValue(leftValue.value - rightValue.value)
   }

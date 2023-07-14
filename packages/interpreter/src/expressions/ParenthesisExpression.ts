@@ -33,6 +33,10 @@ export class ParenthesisExpression extends Expression {
     this.inner = inner
   }
 
+  returnType(context?: Scope | undefined): string {
+    return this.inner[this.inner.length - 1].returnType(context)
+  }
+
   raw() {
     return `(${this.inner.map(ex => ex.raw()).join(' ')})`
   }

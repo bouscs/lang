@@ -65,7 +65,7 @@ export class PlusOperationExpression extends Expression {
 
     // TODO check if left and right types are compatible
 
-    return 'number'
+    return 'value'
   }
 
   async execute(context: Scope) {

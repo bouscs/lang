@@ -7,7 +7,7 @@ import { ParenthesisExpression } from './ParenthesisExpression.js'
 
 export class CallExpression extends Expression {
   static match(code: Expression[]): boolean {
-    return code.some((ex, i) => ex.returnType() === 'symbol' && code[i + 1] instanceof ParenthesisExpression)
+    return code.some((ex, i) => ex.returnType() === 'value' && code[i + 1] instanceof ParenthesisExpression)
   }
 
   static async validate(code: Expression[]): Promise<boolean> {
@@ -18,7 +18,7 @@ export class CallExpression extends Expression {
     const { code } = options
 
     const callIndex = code.findIndex(
-      (ex, i) => ex.returnType() === 'symbol' && code[i + 1] instanceof ParenthesisExpression
+      (ex, i) => ex.returnType() === 'value' && code[i + 1] instanceof ParenthesisExpression
     )
 
     const symbol = code[callIndex] as Expression
@@ -54,6 +54,6 @@ export class CallExpression extends Expression {
   }
 
   returnType(): string {
-    return 'call'
+    return 'value'
   }
 }

@@ -3,12 +3,18 @@ if true print("its true")
 
 my_var <- 10
 
+print(-1)
+
+my_var2 <- -3
+
+print(-my_var2)
+
 if my_var < 10 print("its less than 10")
 else print("its not less than 10")
 
 my_conditional_var <- if my_var < 10 1 else 2
-
-my_varr <- 11
+// asdasdasd
+my_varr <- 11 //asdadsfhgsdkfajgsdfjkshdgfushxc
 
 if(my_varr < 10) {
   print("its less than 10")
@@ -18,6 +24,9 @@ if(my_varr < 10) {
   print("its:")
   print(my_varr)
 }
+/*
+asddfsdfgsd
+*/
 
 print(my_conditional_var)
 
@@ -46,8 +55,16 @@ print(
   b
   "ahldksjadl"
 )
+/*
 
-print(cool)
+asdjsdgfjsdf
+
+
+
+asdkfhsdkf
+
+*/
+print/*sdasduiayd*/(co/* adsufisdgfusadgf */ol)
 print(my_other_var)
 
 my_var_two <- 3

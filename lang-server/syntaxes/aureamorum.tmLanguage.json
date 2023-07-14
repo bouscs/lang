@@ -22,6 +22,12 @@
     },
     {
       "include": "#variables"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#strings-single"
     }
   ],
   "repository": {
@@ -76,6 +82,24 @@
         {
           "name": "constant.character.escape.aureamorum",
           "match": "\\\\."
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.aureamorum",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.aureamorum",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.block.documentation.aureamorum",
+          "begin": "/\\*\\*",
+          "end": "\\*/"
         }
       ]
     }

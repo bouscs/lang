@@ -35,7 +35,7 @@ export class StringLiteralExpression extends Expression {
   }
 
   returnType() {
-    return 'string'
+    return 'value'
   }
 
   async execute(context: Scope) {

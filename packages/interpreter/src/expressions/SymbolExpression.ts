@@ -42,7 +42,7 @@ export class SymbolExpression extends Expression<string, Value> {
   }
 
   returnType(): string {
-    return 'symbol'
+    return 'value'
   }
 
   async execute(context: Scope) {

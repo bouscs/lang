@@ -34,9 +34,13 @@ export class StatementExpression extends Expression {
 
     for (let i = firstNewLineIndex - 1; i < code.length; i += 2) {
       if (i < 0) continue
-      if (i + 1 < code.length && !(code[i + 1] instanceof TokenExpression && code[i + 1].raw() === '\n')) {
+      const nextLine = code[i + 1]
+      if (i + 1 < code.length && !(nextLine instanceof TokenExpression && nextLine.value === '\n')) {
         throw new Error('Invalid statement: expected newline', {
-          cause: { lines: [code[i], code[i + 1]], code: JSON.stringify(code, null, 2) }
+          cause: {
+            lines: [JSON.stringify(code[i], null, 2), JSON.stringify(code[i + 1], null, 2)],
+            code: JSON.stringify(code, null, 2)
+          }
         })
       }
       statements.push(code[i])

@@ -40,7 +40,7 @@ export class BooleanLiteralExpression extends Expression {
   }
 
   returnType(): string {
-    return 'boolean'
+    return 'value'
   }
 
   async execute(context: Scope) {

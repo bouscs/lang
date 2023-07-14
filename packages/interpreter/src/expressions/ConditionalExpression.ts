@@ -75,6 +75,10 @@ export class ConditionalExpression extends Expression {
     this.falseBlock = falseBlock
   }
 
+  returnType(context?: Scope | undefined): string {
+    return this.trueBlock.returnType(context)
+  }
+
   raw() {
     return `if ${this.condition.raw()} ${this.trueBlock.raw()}${
       this.falseBlock ? ` else ${this.falseBlock.raw()}` : ''

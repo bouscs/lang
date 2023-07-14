@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 import { Readable, Writable, PassThrough } from 'stream'
 import { Scope } from './Scope.js'
 import { ParenthesisExpression } from './expressions/ParenthesisExpression.js'
-import { getBlockInner, range } from './util.js'
+import { getBlockInner, isDigitToken, isWordToken, range } from './util.js'
 import { Expression, ExpressionConstructor } from './Expression.js'
 import { TokenExpression } from './expressions/TokenExpression.js'
 import { SymbolExpression } from './expressions/SymbolExpression.js'
@@ -114,10 +114,12 @@ const getCharType = (char: string) => {
 
 const cleanCode = (code: string) => {
   const chars = code
-    .trim()
+    .replace(/\/\/.*$/gm, '')
+    .replace(/\/\*((?!\*\/).)*\*\//gs, '')
     .replace(/(?<nl>\r\n|\n|\r)+/g, '\n')
     .replace(/(?<tab>\t)+/g, '\t')
     .replace(/(?<space> )+/g, ' ')
+    .trim()
     .split('')
     .filter((char, index, chars) => {
       // if (charTypes.whitespace.includes(char)) {
@@ -152,6 +154,12 @@ const tokenize = (code: string) => {
 
   for (let i = 0; i < code.length; i++) {
     const character = code[i]
+
+    if (isDigitToken(character) && isWordToken(currentToken)) {
+      currentToken += character
+
+      continue
+    }
 
     if (character === '"') {
       if (currentToken.length > 0) {
@@ -247,7 +255,10 @@ export class Interpreter {
     // blocks
     ParenthesisExpression,
     BlockExpression,
-    // operators
+    // unary operators
+    // NotExpression,
+    // NegativeExpression,
+    // binary operators
     MultiplicationExpression,
     DivisionExpression,
     PlusOperationExpression,
