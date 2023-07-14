@@ -4,7 +4,7 @@ export class SymbolValue extends Value {
   value: string
 
   constructor(value: string) {
-    super()
+    super('symbol')
     this.value = value
   }
 

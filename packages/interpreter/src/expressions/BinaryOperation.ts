@@ -1,27 +1,36 @@
 import { Expression, ParserOptions } from '../Expression.js'
 import { Scope } from '../Scope.js'
+import { TypeValue } from '../values/TypeValue.js'
 import { Value } from '../Value.js'
 import { TokenExpression } from './TokenExpression.js'
 
-import { Class } from 'aureamorum/src/util/types.js'
+export const binaryOperationsTypeSymbol: unique symbol = Symbol()
+
+declare module '../values/TypeValue.js' {
+  interface TypeValueProperties {
+    [binaryOperationsTypeSymbol]?: {
+      [operator: string]:
+        | {
+            [typeName: string]: ((left: any, right: any) => Value) | undefined
+          }
+        | undefined
+    }
+  }
+}
 
 export interface BinaryOperationType {
   ParsedType: string
   ResultType: Value
 }
-namespace BinaryOperation {
-  export type ParsedType<T extends BinaryOperationType> = T['ParsedType'] & string
-  export type ResultType<T extends BinaryOperationType> = T['ResultType'] & Value
-}
 
-export interface BinaryOperationOptions<ResultType extends Value> {
+export interface BinaryOperationOptions {
   parsedType: string
   operator: string
   returnType: string
-  result: (left: Value, right: Value) => ResultType
+  parse?: (options: ParserOptions) => Promise<void>
 }
 
-export const binaryOperation = <ResultType extends Value>(options: BinaryOperationOptions<ResultType>) => {
+export const binaryOperation = <ResultType extends Value>(options: BinaryOperationOptions) => {
   const BinaryOperationClass = class extends Expression<string, ResultType> {
     static match(code: Expression[]) {
       return code.some(e => e instanceof TokenExpression && e.value === options.operator)
@@ -31,7 +40,23 @@ export const binaryOperation = <ResultType extends Value>(options: BinaryOperati
       return true
     }
 
-    declare static parse: (options: ParserOptions) => Promise<void>
+    static parse =
+      options.parse ??
+      (async (_options: ParserOptions) => {
+        const { code } = _options
+
+        const plusIndex = code.findIndex(e => e instanceof TokenExpression && e.value === options.operator)
+
+        if (plusIndex === -1) throw new Error(`Operator "${options.operator}" not found in code.`)
+
+        const left = code[plusIndex - 1]
+
+        const rightIndex = code.slice(plusIndex + 1).findIndex(t => !(t instanceof TokenExpression && t.value === '\n'))
+
+        const right = code[plusIndex + rightIndex + 1]
+
+        code.splice(plusIndex - 1, rightIndex + 3, new BinaryOperationClass(left, right))
+      })
 
     leftOperand: Expression
     rightOperand: Expression
@@ -53,25 +78,35 @@ export const binaryOperation = <ResultType extends Value>(options: BinaryOperati
 
     async execute(context: Scope) {
       const leftValue = await this.leftOperand.execute(context)
+
       const rightValue = await this.rightOperand.execute(context)
-      return options.result(leftValue, rightValue) as ResultType
+
+      if (!context.exists(leftValue.type())) throw new Error(`Type "${leftValue.type()}" not found`)
+      if (!context.exists(rightValue.type())) throw new Error(`Type "${rightValue.type()}" not found`)
+
+      const leftType = context.get(leftValue.type())
+      const rightType = context.get(rightValue.type())
+
+      if (!leftType.value) throw new Error(`Malformed ScopeProperty "${leftValue.type()}"`)
+      if (!(leftType.value instanceof TypeValue)) throw new Error(`Type "${leftValue.type()}" is not a type`)
+
+      if (!rightType.value) throw new Error(`Malformed ScopeProperty "${rightValue.type()}"`)
+      if (!(rightType.value instanceof TypeValue)) throw new Error(`Type "${rightValue.type()}" is not a type`)
+
+      const leftTypeValue = leftType.value
+      const rightTypeValue = rightType.value
+
+      const operator =
+        leftTypeValue.properties[binaryOperationsTypeSymbol]?.[options.operator]?.[rightTypeValue.typeName] ??
+        rightTypeValue.properties[binaryOperationsTypeSymbol]?.[options.operator]?.[leftTypeValue.typeName]
+
+      if (!operator)
+        throw new Error(
+          `Operator "${options.operator}" not found for types "${leftTypeValue.typeName}" and "${rightTypeValue.typeName}"`
+        )
+
+      return operator(leftValue, rightValue) as ResultType
     }
-  }
-
-  BinaryOperationClass.parse = async (_options: ParserOptions) => {
-    const { code } = _options
-
-    const plusIndex = code.findIndex(e => e instanceof TokenExpression && e.value === options.operator)
-
-    if (plusIndex === -1) throw new Error(`Operator "${options.operator}" not found`)
-
-    const left = code[plusIndex - 1]
-
-    const rightIndex = code.slice(plusIndex + 1).findIndex(t => !(t instanceof TokenExpression && t.value === '\n'))
-
-    const right = code[plusIndex + rightIndex + 1]
-
-    code.splice(plusIndex - 1, rightIndex + 3, new BinaryOperationClass(left, right))
   }
 
   return BinaryOperationClass as {

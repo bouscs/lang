@@ -4,7 +4,7 @@ export class BooleanValue extends Value {
   value: boolean
 
   constructor(value: boolean) {
-    super()
+    super('boolean')
     this.value = value
   }
 

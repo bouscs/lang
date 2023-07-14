@@ -4,7 +4,7 @@ export class NumberValue extends Value {
   value: number
 
   constructor(value: number) {
-    super()
+    super('number')
     this.value = value
   }
 

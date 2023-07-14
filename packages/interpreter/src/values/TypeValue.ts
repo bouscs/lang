@@ -1,24 +1,31 @@
 import { Value } from '../Value.js'
-import { metaSymbol } from '../meta.js'
+
+export interface TypeValueProperties {}
 
 export class TypeValue extends Value {
-  declare [metaSymbol]: {
-    [key: string]: any
+  typeName: string
+
+  properties: TypeValueProperties = {} as any
+
+  constructor(typeName: string, properties?: TypeValueProperties) {
+    super('type')
+
+    this.typeName = typeName
+
+    if (properties) {
+      this.properties = properties
+    }
   }
 
-  clone(): Value {
-    return new TypeValue()
+  raw() {
+    return this.typeName
   }
 
-  type(): string {
+  type() {
     return 'type'
   }
 
-  raw(): string {
-    return 'type'
-  }
-
-  toString(): string {
-    return 'type'
+  clone() {
+    return new TypeValue(this.typeName)
   }
 }

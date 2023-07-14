@@ -12,4 +12,8 @@ export class NoneValue extends Value {
   clone() {
     return new NoneValue()
   }
+
+  constructor() {
+    super('none')
+  }
 }

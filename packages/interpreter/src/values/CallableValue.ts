@@ -3,7 +3,7 @@ import { Value } from '../Value.js'
 export class CallableValue extends Value {
   callable: CallableFunction
   constructor(callable: CallableFunction) {
-    super()
+    super('callable')
     this.callable = callable
   }
 

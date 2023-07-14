@@ -5,7 +5,7 @@ export class ModuleValue extends Value {
   scope: Scope
 
   constructor(scope: Scope) {
-    super()
+    super('module')
 
     this.scope = scope
   }

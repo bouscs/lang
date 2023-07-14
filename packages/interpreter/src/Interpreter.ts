@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 import { Readable, Writable, PassThrough } from 'stream'
 import { Scope } from './Scope.js'
 import { ParenthesisExpression } from './expressions/ParenthesisExpression.js'
-import { getBlockInner, isDigitToken, isWordToken, range } from './util.js'
+import { getBlockInner, isDigit, isWordToken, range } from './util.js'
 import { Expression, ExpressionConstructor } from './Expression.js'
 import { TokenExpression } from './expressions/TokenExpression.js'
 import { SymbolExpression } from './expressions/SymbolExpression.js'
@@ -29,6 +29,10 @@ import { LessThanOrEqualExpression } from './expressions/comparators/LessThanOrE
 import { StringLiteralExpression } from './expressions/StringLiteralExpression.js'
 import { BlockExpression } from './expressions/BlockExpression.js'
 import { ConditionalExpression } from './expressions/ConditionalExpression.js'
+import { TypeValue } from './values/TypeValue.js'
+import { binaryOperationsTypeSymbol } from './expressions/BinaryOperation.js'
+import { BooleanValue } from './values/BooleanValue.js'
+import { FuckingExpression } from './expressions/FuckingExpression.js'
 
 export type Token = {
   parsedType: 'token'
@@ -155,7 +159,21 @@ const tokenize = (code: string) => {
   for (let i = 0; i < code.length; i++) {
     const character = code[i]
 
-    if (isDigitToken(character) && isWordToken(currentToken)) {
+    if (character === '.' && isDigit(code[i + 1]) && (currentToken === '' || isDigit(currentToken))) {
+      currentToken += character
+
+      console.log(currentToken, code[i + 1])
+
+      continue
+    }
+
+    if (isDigit(character) && currentToken[currentToken.length - 1] === '.') {
+      currentToken += character
+
+      continue
+    }
+
+    if (isDigit(character) && isWordToken(currentToken)) {
       currentToken += character
 
       continue
@@ -247,6 +265,7 @@ const toLines = (code: string) => {
 
 export class Interpreter {
   parsers: ExpressionConstructor[] = [
+    FuckingExpression,
     // literals
     NumberLiteralExpression,
     BooleanLiteralExpression,
@@ -358,14 +377,58 @@ export class Interpreter {
       value: new CallableValue((...args: Value[]) => console.log(...args.map(p => p.toString())))
     })
 
+    const numberType = scope.create('number', {
+      type: 'type',
+      value: new TypeValue('number', {
+        [binaryOperationsTypeSymbol]: {
+          '>': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value > right.value)
+          },
+          '>=': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value >= right.value)
+          },
+          '<': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value < right.value)
+          },
+          '<=': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value <= right.value)
+          },
+          '=': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value === right.value)
+          },
+          '!=': {
+            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value !== right.value)
+          },
+          '+': {
+            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value + right.value)
+          },
+          '-': {
+            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value - right.value)
+          },
+          '*': {
+            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value * right.value)
+          },
+          '/': {
+            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value / right.value)
+          }
+        }
+      })
+    })
+
+    // console.log('Original code:\n')
+    // console.log(code)
+
     const cleanedCode = cleanCode(code)
+
+    // console.log('Cleaned code:\n')
+    // console.log(cleanedCode)
 
     const tokenLines = tokenize(cleanedCode)
 
     const parsed = new ModuleExpression(await this.parse(tokenLines))
 
-    console.log('Parsed code:\n')
-    console.log(parsed.raw())
+    // console.log('Parsed code:\n')
+    // console.log(parsed.raw())
 
     try {
       const result = await parsed.execute(scope)

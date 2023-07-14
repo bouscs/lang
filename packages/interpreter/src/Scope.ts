@@ -34,6 +34,8 @@ export class Scope {
     Object.defineProperty(this.registry, name, {
       value: new ScopeProperty(options)
     })
+
+    return this.registry[name]
   }
 
   get(name: string) {

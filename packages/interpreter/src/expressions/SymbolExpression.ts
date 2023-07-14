@@ -5,6 +5,7 @@ import { isWordToken } from '../util.js'
 import { TokenExpression } from './TokenExpression.js'
 import { Value } from '../Value.js'
 import { SymbolValue } from '../values/SymbolValue.js'
+import { BooleanValue } from '../values/BooleanValue.js'
 
 export class SymbolExpression extends Expression<string, Value> {
   symbol: string

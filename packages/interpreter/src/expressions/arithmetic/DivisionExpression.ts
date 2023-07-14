@@ -3,77 +3,84 @@ import { Scope } from '../../Scope.js'
 import { Value } from '../../Value.js'
 import { NumberValue } from '../../values/NumberValue.js'
 import { TypeValue } from '../../values/TypeValue.js'
+import { binaryOperation } from '../BinaryOperation.js'
 import { TokenExpression } from '../TokenExpression.js'
 
-export class DivisionExpression extends Expression {
-  static match(code: Expression[]) {
-    return code.some(e => e instanceof TokenExpression && e.value === '/')
-  }
+export const DivisionExpression = binaryOperation({
+  operator: '/',
+  parsedType: 'divisionOperation',
+  returnType: 'value'
+})
 
-  static async validate(code: Expression[]) {
-    return true
-  }
+// export class DivisionExpression extends Expression {
+//   static match(code: Expression[]) {
+//     return code.some(e => e instanceof TokenExpression && e.value === '/')
+//   }
 
-  static async parse(options: ParserOptions) {
-    const { code } = options
+//   static async validate(code: Expression[]) {
+//     return true
+//   }
 
-    // console.log('code', JSON.stringify({ raw: code.map(c => c.raw()).join(''), code }, null, 2))
+//   static async parse(options: ParserOptions) {
+//     const { code } = options
 
-    const plusIndex = code.findIndex(e => e instanceof TokenExpression && e.value === '/')
+//     // console.log('code', JSON.stringify({ raw: code.map(c => c.raw()).join(''), code }, null, 2))
 
-    if (plusIndex === -1) throw new Error('Plus not found')
+//     const plusIndex = code.findIndex(e => e instanceof TokenExpression && e.value === '/')
 
-    const left = code[plusIndex - 1]
+//     if (plusIndex === -1) throw new Error('Plus not found')
 
-    const rightIndex = code.slice(plusIndex + 1).findIndex(t => !(t instanceof TokenExpression && t.value === '\n'))
+//     const left = code[plusIndex - 1]
 
-    // const right = code[plusIndex + 1]
-    const right = code[plusIndex + rightIndex + 1]
+//     const rightIndex = code.slice(plusIndex + 1).findIndex(t => !(t instanceof TokenExpression && t.value === '\n'))
 
-    // code.splice(plusIndex - 1, 3, new PlusOperationExpression(left, right))
-    code.splice(plusIndex - 1, rightIndex + 3, new DivisionExpression(left, right))
-  }
+//     // const right = code[plusIndex + 1]
+//     const right = code[plusIndex + rightIndex + 1]
 
-  leftOperand: Expression
-  rightOperand: Expression
+//     // code.splice(plusIndex - 1, 3, new PlusOperationExpression(left, right))
+//     code.splice(plusIndex - 1, rightIndex + 3, new DivisionExpression(left, right))
+//   }
 
-  constructor(leftOperand: Expression, rightOperand: Expression) {
-    super('plusOperation')
+//   leftOperand: Expression
+//   rightOperand: Expression
 
-    this.leftOperand = leftOperand
-    this.rightOperand = rightOperand
-  }
+//   constructor(leftOperand: Expression, rightOperand: Expression) {
+//     super('plusOperation')
 
-  raw() {
-    return `${this.leftOperand.raw()} / ${this.rightOperand.raw()}`
-  }
+//     this.leftOperand = leftOperand
+//     this.rightOperand = rightOperand
+//   }
 
-  returnType(context?: Scope) {
-    // if (!context) throw new Error('Context is required')
+//   raw() {
+//     return `${this.leftOperand.raw()} / ${this.rightOperand.raw()}`
+//   }
 
-    // const leftType = this.leftOperand.returnType()
-    // const leftTypeProp = context.get(leftType)
+//   returnType(context?: Scope) {
+//     // if (!context) throw new Error('Context is required')
 
-    // const rightType = this.rightOperand.returnType()
-    // const rightTypeProp = context.get(rightType)
+//     // const leftType = this.leftOperand.returnType()
+//     // const leftTypeProp = context.get(leftType)
 
-    // if (leftTypeProp.type !== 'type' || rightTypeProp.type !== 'type')
-    //   throw new Error('Left and right operands types not found in scope')
+//     // const rightType = this.rightOperand.returnType()
+//     // const rightTypeProp = context.get(rightType)
 
-    // const leftTypeValue = leftTypeProp.value as TypeValue
-    // const rightTypeValue = rightTypeProp.value as TypeValue
+//     // if (leftTypeProp.type !== 'type' || rightTypeProp.type !== 'type')
+//     //   throw new Error('Left and right operands types not found in scope')
 
-    // TODO check if left and right types are compatible
+//     // const leftTypeValue = leftTypeProp.value as TypeValue
+//     // const rightTypeValue = rightTypeProp.value as TypeValue
 
-    return 'value'
-  }
+//     // TODO check if left and right types are compatible
 
-  async execute(context: Scope) {
-    const leftValue = (await this.leftOperand.execute(context)) as NumberValue
-    const rightValue = (await this.rightOperand.execute(context)) as NumberValue
+//     return 'value'
+//   }
 
-    // TODO execute operation from TypeValue
+//   async execute(context: Scope) {
+//     const leftValue = (await this.leftOperand.execute(context)) as NumberValue
+//     const rightValue = (await this.rightOperand.execute(context)) as NumberValue
 
-    return new NumberValue(leftValue.value / rightValue.value)
-  }
-}
+//     // TODO execute operation from TypeValue
+
+//     return new NumberValue(leftValue.value / rightValue.value)
+//   }
+// }

@@ -3,7 +3,7 @@ import { Value } from '../Value.js'
 export class StringValue extends Value {
   value: string
   constructor(value: string) {
-    super()
+    super('string')
     this.value = value
   }
 

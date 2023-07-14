@@ -59,7 +59,7 @@
       "patterns": [
         {
           "name": "keyword.control.aureamorum",
-          "match": "\\b(if|else|while|for|return)\\b"
+          "match": "\\b(if|set|unit|measurement|fn|init|use|import|in|of|struct|expression|else|you (fucking )?\\w+|while|for|return|please|ass|shit|(?<=for )the love of ((fucking )?)\\w+|(?<=for )\\w+s sake|(fuck(ing)?))\\b"
         }
       ]
     },
