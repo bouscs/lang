@@ -24,6 +24,7 @@ export interface BinaryOperationType {
 }
 
 export interface BinaryOperationOptions {
+  name?: string
   parsedType: string
   operator: string
   returnType: string
@@ -108,6 +109,12 @@ export const binaryOperation = <ResultType extends Value>(options: BinaryOperati
       return operator(leftValue, rightValue) as ResultType
     }
   }
+
+  const className = options.name ?? `${options.parsedType} ${options.operator} ${options.parsedType}`
+
+  Object.defineProperty(BinaryOperationClass, 'name', {
+    value: className
+  })
 
   return BinaryOperationClass as {
     match(input: Expression[]): boolean

@@ -1,6 +1,4 @@
-import { resolve } from 'path'
 import { readFile } from 'fs/promises'
-import { Readable, Writable, PassThrough } from 'stream'
 import { Scope } from './Scope.js'
 import { ParenthesisExpression } from './expressions/ParenthesisExpression.js'
 import { getBlockInner, isDigit, isWordToken, range } from './util.js'
@@ -67,15 +65,15 @@ export interface ParsedInternalLine {
 
 export interface ExecuteOptions {
   modulePath?: string
-  stdout?: Writable
-  stdin?: Readable
-  stderr?: Writable
+  // stdout?: Writable
+  // stdin?: Readable
+  // stderr?: Writable
 }
 
 export interface ExecuteFileOptions {
-  stdout?: Writable
-  stdin?: Readable
-  stderr?: Writable
+  // stdout?: Writable
+  // stdin?: Readable
+  // stderr?: Writable
 }
 
 const charTypes = {
@@ -360,15 +358,15 @@ export class Interpreter {
   }
 
   async execute(code: string, options?: ExecuteOptions) {
-    const resolvedModulePath = resolve(options?.modulePath ?? process.cwd())
+    // const resolvedModulePath = resolve(options?.modulePath ?? process.cwd())
 
-    const stdout = options?.stdout ?? process.stdout
-    const stdin = options?.stdin ?? process.stdin
-    const stderr = options?.stderr ?? process.stderr
+    // const stdout = options?.stdout ?? process.stdout
+    // const stdin = options?.stdin ?? process.stdin
+    // const stderr = options?.stderr ?? process.stderr
 
-    const pass = new PassThrough()
+    // const pass = new PassThrough()
 
-    pass.pipe(stdout)
+    // pass.pipe(stdout)
 
     const scope = new Scope()
 
@@ -433,8 +431,8 @@ export class Interpreter {
     try {
       const result = await parsed.execute(scope)
 
-      pass.unpipe(stdout)
-      pass.end()
+      // pass.unpipe(stdout)
+      // pass.end()
 
       return result
     } catch (error) {
@@ -444,24 +442,24 @@ export class Interpreter {
     }
   }
 
-  async executeFile(path: string, options?: ExecuteFileOptions) {
-    const resolvedPath = resolve(path)
+  // async executeFile(path: string, options?: ExecuteFileOptions) {
+  //   // const resolvedPath = resolve(path)
 
-    try {
-      const content = await readFile(resolvedPath, 'utf-8')
+  //   try {
+  //     // const content = await readFile(resolvedPath, 'utf-8')
 
-      const executeOptions: ExecuteOptions = {
-        modulePath: resolvedPath,
-        stdout: options?.stdout,
-        stdin: options?.stdin,
-        stderr: options?.stderr
-      }
+  //     // const executeOptions: ExecuteOptions = {
+  //     //   modulePath: resolvedPath,
+  //     //   stdout: options?.stdout,
+  //     //   stdin: options?.stdin,
+  //     //   stderr: options?.stderr
+  //     // }
 
-      return await this.execute(content, executeOptions)
-    } catch (error) {
-      throw new Error('Failed to execute file', {
-        cause: error
-      })
-    }
-  }
+  //     return await this.execute(content) //, executeOptions)
+  //   } catch (error) {
+  //     throw new Error('Failed to execute file', {
+  //       cause: error
+  //     })
+  //   }
+  // }
 }

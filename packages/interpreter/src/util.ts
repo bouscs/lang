@@ -39,3 +39,8 @@ export const isNumberLiteral = (token: string) => {
 export const range = (length: number, start = 0) => {
   return Array.from({ length }, (_, index) => index + start)
 }
+
+export const namedClass = (name: string, base: any) =>
+  ({
+    [name]: class extends base {}
+  })[name]

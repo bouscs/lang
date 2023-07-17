@@ -1,0 +1,19 @@
+{
+  "name": "web",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "sass": "^1.63.6",
+    "vite": "^4.4.4"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "interpreter"
+    ]
+  }
+}
