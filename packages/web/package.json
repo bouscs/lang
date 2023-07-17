@@ -9,11 +9,15 @@
   },
   "devDependencies": {
     "sass": "^1.63.6",
-    "vite": "^4.4.4"
+    "vite": "^4.4.4",
+    "vite-plugin-solid": "^2.7.0"
   },
   "nx": {
     "implicitDependencies": [
       "interpreter"
     ]
+  },
+  "dependencies": {
+    "solid-js": "^1.7.8"
   }
 }

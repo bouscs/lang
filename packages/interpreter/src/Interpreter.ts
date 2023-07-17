@@ -31,6 +31,8 @@ import { TypeValue } from './values/TypeValue.js'
 import { binaryOperationsTypeSymbol } from './expressions/BinaryOperation.js'
 import { BooleanValue } from './values/BooleanValue.js'
 import { FuckingExpression } from './expressions/FuckingExpression.js'
+import { applyStandardLibrary } from './std.js'
+import { CodeString } from './CodeString.js'
 
 export type Token = {
   parsedType: 'token'
@@ -65,6 +67,7 @@ export interface ParsedInternalLine {
 
 export interface ExecuteOptions {
   modulePath?: string
+  scope?: Scope
   // stdout?: Writable
   // stdin?: Readable
   // stderr?: Writable
@@ -368,53 +371,18 @@ export class Interpreter {
 
     // pass.pipe(stdout)
 
+    const codeString = new CodeString(code)
+
+    const cleaned = codeString.toCleaned()
+
+    console.log({
+      codeString,
+      cleaned
+    })
+
     const scope = new Scope()
 
-    scope.create('print', {
-      type: 'callable',
-      value: new CallableValue((...args: Value[]) => console.log(...args.map(p => p.toString())))
-    })
-
-    const numberType = scope.create('number', {
-      type: 'type',
-      value: new TypeValue('number', {
-        [binaryOperationsTypeSymbol]: {
-          '>': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value > right.value)
-          },
-          '>=': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value >= right.value)
-          },
-          '<': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value < right.value)
-          },
-          '<=': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value <= right.value)
-          },
-          '=': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value === right.value)
-          },
-          '!=': {
-            number: (left: NumberValue, right: NumberValue) => new BooleanValue(left.value !== right.value)
-          },
-          '+': {
-            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value + right.value)
-          },
-          '-': {
-            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value - right.value)
-          },
-          '*': {
-            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value * right.value)
-          },
-          '/': {
-            number: (left: NumberValue, right: NumberValue) => new NumberValue(left.value / right.value)
-          }
-        }
-      })
-    })
-
-    // console.log('Original code:\n')
-    // console.log(code)
+    applyStandardLibrary(scope)
 
     const cleanedCode = cleanCode(code)
 
@@ -441,25 +409,4 @@ export class Interpreter {
       })
     }
   }
-
-  // async executeFile(path: string, options?: ExecuteFileOptions) {
-  //   // const resolvedPath = resolve(path)
-
-  //   try {
-  //     // const content = await readFile(resolvedPath, 'utf-8')
-
-  //     // const executeOptions: ExecuteOptions = {
-  //     //   modulePath: resolvedPath,
-  //     //   stdout: options?.stdout,
-  //     //   stdin: options?.stdin,
-  //     //   stderr: options?.stderr
-  //     // }
-
-  //     return await this.execute(content) //, executeOptions)
-  //   } catch (error) {
-  //     throw new Error('Failed to execute file', {
-  //       cause: error
-  //     })
-  //   }
-  // }
 }
