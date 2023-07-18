@@ -1,62 +1,64 @@
-export class CleanedCodeString {
-  [Symbol.toPrimitive]() {
-    return this.toString()
-  }
+/**
+ * A token is a slice of a code string that is to be processed as a single unit.
+ */
+export class CodeToken extends String {
+  readonly value: string
+  readonly position: number
 
-  toString() {
-    return this.valueOf()
-  }
+  /**
+   * @param value Full token in string form
+   * @param position Position of the token in the code string, starting from the token's first character
+   */
+  constructor(value: string, position: number) {
+    super(value)
 
-  valueOf() {
-    return this as unknown as string
-  }
-
-  value: string
-  mapping: ReadonlyArray<number>
-  original: CodeString
-
-  constructor(cleaned: string, mapping: ReadonlyArray<number>, original: CodeString) {
-    this.value = cleaned
-    this.mapping = mapping
-    this.original = original
-  }
-
-  getOriginalPosition(cleanedPosition: number) {
-    return this.mapping[cleanedPosition]
+    this.position = position
   }
 }
 
 export class CodeString {
+  readonly initial: string
+
+  currentIndex: number
+
   value: string
+
   constructor(value: string) {
+    this.initial = value
     this.value = value
+    this.currentIndex = 0
   }
 
-  static isCodeString(value: unknown): value is CodeString {
-    return value instanceof CodeString
+  /**
+   * Finds the next token in the code string.
+   * @returns The next token in the code string
+   */
+  nextToken() {
+    // TODO implement next token finding
+    const length = 1
+
+    const tokenString = this.value.slice(0, length)
+
+    const token = new CodeToken(tokenString, this.currentIndex)
+
+    return token
   }
 
-  firstLine() {
-    return this.value.split('\n')[0]
+  /**
+   * Consumes (erases) the first `length` characters of the code string.
+   * @param length Number of characters to consume
+   */
+  consume(length: number) {
+    this.value = this.value.slice(length)
+
+    this.currentIndex += length
   }
 
-  toCleaned() {
-    const cleaned = this.value.slice().replace(/\s+/g, ' ').trim()
-    const mapping: number[] = []
-    let originalPosition = 0
-    let cleanedPosition = 0
-
-    while (originalPosition < this.value.length) {
-      if (this[originalPosition] === ' ') {
-        mapping[cleanedPosition] = originalPosition
-        originalPosition++
-      } else {
-        mapping[cleanedPosition] = originalPosition
-        originalPosition++
-        cleanedPosition++
-      }
-    }
-
-    return new CleanedCodeString(cleaned, mapping, this)
+  /**
+   * Returns the nth line of the code string.
+   * @param index Line index
+   */
+  line(index = 0) {
+    for (let i = 0; i < this.value.length; i++) {}
   }
 }

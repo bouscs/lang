@@ -373,12 +373,7 @@ export class Interpreter {
 
     const codeString = new CodeString(code)
 
-    const cleaned = codeString.toCleaned()
-
-    console.log({
-      codeString,
-      cleaned
-    })
+    console.log(codeString)
 
     const scope = new Scope()
 
