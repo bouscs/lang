@@ -26,13 +26,14 @@ export class Scope {
     return this.registry[name] !== undefined
   }
 
-  create(name: string, options: ScopePropertyOptions) {
+  create<T extends Value | undefined>(name: string, options: ScopePropertyOptions<T>) {
     if (Object.hasOwn(this.registry, name)) {
       throw new Error(`Symbol "${name}" already exists`)
     }
 
     Object.defineProperty(this.registry, name, {
-      value: new ScopeProperty(options)
+      value: new ScopeProperty(options),
+      enumerable: true
     })
 
     return this.registry[name]

@@ -32,7 +32,8 @@ import { binaryOperationsTypeSymbol } from './expressions/BinaryOperation.js'
 import { BooleanValue } from './values/BooleanValue.js'
 import { FuckingExpression } from './expressions/FuckingExpression.js'
 import { applyStandardLibrary } from './std.js'
-import { CodeString } from './CodeString.js'
+import { CodeString, TokenProcessor, TokenProcessorValue } from './CodeString.js'
+import { ScopeProperty } from './ScopeProperty.js'
 
 export type Token = {
   parsedType: 'token'
@@ -379,28 +380,51 @@ export class Interpreter {
 
     applyStandardLibrary(scope)
 
-    const cleanedCode = cleanCode(code)
+    console.log(
+      'scope',
+      scope,
+      scope.registry,
+      Object.values(scope.registry).filter(v => {
+        console.log(v.type)
+        return v.type === 'tokenProcessor'
+      })
+    )
 
-    // console.log('Cleaned code:\n')
-    // console.log(cleanedCode)
+    const tokenProcessors = (
+      Object.entries(scope.registry).filter(([, value]) => value.type === 'tokenProcessor') as [
+        string,
+        ScopeProperty<TokenProcessorValue>
+      ][]
+    ).map(([, value]) => value.value.value)
 
-    const tokenLines = tokenize(cleanedCode)
+    console.log('Token processors:\n', tokenProcessors)
 
-    const parsed = new ModuleExpression(await this.parse(tokenLines))
+    const firstToken = codeString.nextToken(tokenProcessors)
+
+    console.log('First token:\n', firstToken)
+
+    // const cleanedCode = cleanCode(code)
+
+    // // console.log('Cleaned code:\n')
+    // // console.log(cleanedCode)
+
+    // const tokenLines = tokenize(cleanedCode)
+
+    // const parsed = new ModuleExpression(await this.parse(tokenLines))
 
     // console.log('Parsed code:\n')
     // console.log(parsed.raw())
 
     try {
-      const result = await parsed.execute(scope)
+      // const result = await parsed.execute(scope)
 
       // pass.unpipe(stdout)
       // pass.end()
 
-      return result
+      return
     } catch (error) {
       throw new Error('Failed to execute code', {
-        cause: { code: JSON.stringify(parsed, null, 2), error }
+        // cause: { code: JSON.stringify(parsed, null, 2), error }
       })
     }
   }

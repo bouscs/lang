@@ -1,3 +1,5 @@
+import { Value } from './Value.js'
+
 /**
  * A token is a slice of a code string that is to be processed as a single unit.
  */
@@ -16,6 +18,36 @@ export class CodeToken extends String {
   }
 }
 
+export interface TokenProcessorState {
+  string: CodeString
+  buffer: string
+
+  clearBuffer(): void
+  continue(): void
+  next(): void
+  end(): void
+}
+
+export interface TokenProcessor {
+  (options: TokenProcessorState): void
+}
+export class TokenProcessorValue extends Value {
+  constructor(public value: TokenProcessor) {
+    super('tokenProcessor')
+  }
+
+  clone(): Value {
+    return new TokenProcessorValue(this.value)
+  }
+
+  raw(): string {
+    return this.value.toString()
+  }
+
+  type(): string {
+    return 'tokenProcessor'
+  }
+}
 export class CodeString {
   readonly initial: string
 
@@ -33,15 +65,47 @@ export class CodeString {
    * Finds the next token in the code string.
    * @returns The next token in the code string
    */
-  nextToken() {
-    // TODO implement next token finding
-    const length = 1
+  nextToken(processors: TokenProcessor[], initialLength = 0) {
+    let current = 0
+    let found = false
+    let token: string | undefined = undefined as any
 
-    const tokenString = this.value.slice(0, length)
+    const process = (processor: TokenProcessor, state: TokenProcessorState) => {
+      processor(state)
 
-    const token = new CodeToken(tokenString, this.currentIndex)
+      // if (!found) state.next()
+    }
 
-    return token
+    process(processors[current], {
+      string: this,
+      buffer: '',
+      clearBuffer() {
+        this.buffer = ''
+      },
+      continue() {
+        this.buffer += this.string.value[0]
+      },
+      next() {
+        current++
+
+        if (current >= processors.length) return
+
+        process(processors[current], this)
+      },
+      end() {
+        token = this.buffer
+        found = true
+      }
+    })
+
+    if (!processors.length) throw new Error('No processors provided')
+    if (token === undefined) {
+      this.nextToken(processors, initialLength + 1)
+    }
+
+    this.consume((token as string).length)
+
+    return new CodeToken(token!, this.currentIndex) as CodeToken
   }
 
   /**
