@@ -179,3 +179,36 @@ struct Element {
 local {
   // Don't export stuff
 }
+
+struct App {
+  extends Element
+
+  started = false
+
+
+  method start() {
+    if started {
+      throw Error("App already started")
+    }
+
+    started = true
+  }
+  
+  type_mod start #{ // #{} means parse-time block
+    started: true
+  }
+
+
+  static new() {
+    App {}
+  }
+}
+
+my_fn <- () -> {
+  let a <- App.new() // a: App
+
+  a.start() // a: App<started = true>
+
+  a.start() // Error: start requires App<started = false>, got App<started = true>
+
+}
